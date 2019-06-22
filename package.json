@@ -1,0 +1,44 @@
+{
+  "name": "blueprint",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "ts-node src",
+    "test": "jest",
+    "coverage": "jest --coverage",
+    "prettier": "prettier ./src/**/*.* --write",
+    "lint": "tslint --fix --project '.'"
+  },
+  "devDependencies": {
+    "@types/jest": "^24.0.12",
+    "husky": "^2.4.1",
+    "jest": "^24.8.0",
+    "lint-staged": "^8.1.7",
+    "prettier": "^1.17.0",
+    "ts-jest": "^24.0.2",
+    "ts-node": "^8.3.0",
+    "tslint": "^5.18.0",
+    "typescript": "^3.5.2"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "pre-push": "npm test"
+    }
+  },
+  "lint-staged": {
+    "src/**/*.ts": [
+      "npm run prettier",
+      "npm run lint",
+      "npm test",
+      "git add"
+    ],
+    "./*.ts": [
+      "npm run prettier",
+      "git add"
+    ]
+  },
+  "author": "",
+  "license": "ISC"
+}
