@@ -2,8 +2,18 @@ import GitConfig from '../GitConfig';
 
 describe('GitConfig test', () => {
   it('test getters', () => {
-    const config = new GitConfig({ name: 'Gribadze', email: 'fedor.dmitry@gmail.com' });
-    expect(config.Name).toBe('Gribadze');
-    expect(config.Email).toBe('fedor.dmitry@gmail.com');
+    const config = new GitConfig();
+    const testUser = {
+      email: 'john@example.com',
+      name: 'John',
+    };
+    const remote = {
+      name: 'origin',
+      url: 'https://github.com/john/example.git',
+    };
+    config.setUserData(testUser.name, testUser.email);
+    expect(config.getUserData()).toEqual(testUser);
+    config.addRemote(remote.name, remote.url);
+    expect(config.getRemote(remote.name)).toEqual(remote);
   });
 });

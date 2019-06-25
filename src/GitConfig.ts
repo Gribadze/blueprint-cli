@@ -1,23 +1,36 @@
-interface IUserInfo {
+interface IRemoteData {
+  name: string;
+  url: string;
+}
+
+interface IUserData {
   name: string;
   email: string;
 }
 
 class GitConfig {
-  private readonly userName: string;
-  private readonly userEmail: string;
+  private userData: IUserData | undefined;
+  private remotes: {
+    [name: string]: IRemoteData;
+  } = {};
 
-  constructor(userInfo: IUserInfo) {
-    this.userEmail = userInfo.email;
-    this.userName = userInfo.name;
+  public getUserData(): IUserData | undefined {
+    return this.userData;
   }
 
-  get Name() {
-    return this.userName;
+  public setUserData(name: string, email: string): void {
+    this.userData = { name, email };
   }
 
-  get Email() {
-    return this.userEmail;
+  public addRemote(name: string, url: string): void {
+    this.remotes[name] = {
+      name,
+      url,
+    };
+  }
+
+  public getRemote(name: string): IRemoteData {
+    return this.remotes[name];
   }
 }
 
