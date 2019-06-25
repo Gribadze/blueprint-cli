@@ -1,4 +1,4 @@
-import GitConfig from '../git.config';
+import GitConfig from '../GitConfig';
 
 describe('GitConfig test', () => {
   it('test getters', () => {
