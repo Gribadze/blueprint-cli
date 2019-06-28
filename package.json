@@ -12,6 +12,7 @@
   },
   "devDependencies": {
     "@types/jest": "^24.0.12",
+    "@types/node": "^12.0.10",
     "husky": "^2.4.1",
     "jest": "^24.8.0",
     "lint-staged": "^8.1.7",
@@ -40,5 +41,8 @@
     ]
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "inquirer": "^6.4.1"
+  }
 }
