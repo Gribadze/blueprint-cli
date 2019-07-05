@@ -16,7 +16,7 @@ class ConsoleUI {
     });
   }
 
-  public ask(question: string) {
+  public ask(question: string): Promise<string> {
     return new Promise((resolve) => {
       this.rl.question(`${question} `, (answer) => {
         resolve(answer);
@@ -24,7 +24,7 @@ class ConsoleUI {
     });
   }
 
-  public select(question: string, options: string[]) {
+  public select(question: string, options: string[]): Promise<string> {
     return new Promise((resolve) => {
       const renderString = [
         question,

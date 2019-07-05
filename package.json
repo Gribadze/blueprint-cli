@@ -24,15 +24,13 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged",
-      "pre-push": "npm test"
+      "pre-commit": "lint-staged"
     }
   },
   "lint-staged": {
     "src/**/*.ts": [
       "npm run prettier",
       "npm run lint",
-      "npm test",
       "git add"
     ],
     "./*.ts": [
@@ -41,8 +39,5 @@
     ]
   },
   "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "inquirer": "^6.4.1"
-  }
+  "license": "ISC"
 }
