@@ -21,7 +21,7 @@ export function createFile(filePath: string, data: string) {
 
 export function execExternal(
   command: string,
-  callback?: (error: Error | null, data: string | null) => void,
+  callback?: (error: Error | string | null, data: string | null) => void,
 ): Promise<boolean> {
   return new Promise((resolve, reject) => {
     const npmProcess = exec(command);

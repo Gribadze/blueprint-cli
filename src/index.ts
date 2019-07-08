@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import ConsoleUI from './console.ui';
 import Project from './project';
 
@@ -25,5 +26,5 @@ if (validateArguments()) {
       process.exit(1);
     });
 } else {
-  process.stderr.write('TODO: usage help\n');
+  process.stderr.write(`Usage example:\n\tblueprint PROJECT_DIRECTORY\n`);
 }

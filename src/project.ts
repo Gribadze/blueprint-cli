@@ -67,9 +67,7 @@ const tsConfig = {
 
 const tsLintConfig = {
   defaultSeverity: 'error',
-  extends: [
-    'tslint:recommended',
-  ],
+  extends: ['tslint:recommended'],
   jsRules: {},
   rules: {
     quotemark: false,
@@ -110,10 +108,17 @@ class Project {
     await execExternal(`cd ${directory} && npm i -D ${devDependencies.join(' ')}`);
     this.ui.writeln('OK');
     this.ui.write('Initial project commit...');
-    await execExternal(`cd ${directory} && git add . && git commit -am 'initial blueprint commit'`, (error, data) => {
-      process.stdout.write('error: ' + error + '\n');
-      process.stdout.write('data: ' + data + '\n');
-    });
+    await execExternal(
+      `cd ${directory} && git add . && git commit -am 'initial blueprint commit'`,
+      (error, data) => {
+        if (error) {
+          this.ui.write(error.toString());
+        }
+        if (data) {
+          this.ui.write(data);
+        }
+      },
+    );
     this.ui.writeln('OK');
   }
 }
