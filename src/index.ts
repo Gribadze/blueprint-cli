@@ -1,22 +1,29 @@
 import ConsoleUI from './console.ui';
-import { makeDirectory } from './helpers';
-import { IProjectSettings } from './types/project.settings';
+import Project from './project';
+
+function validateArguments() {
+  return process.argv.length > 2;
+}
 
 async function main() {
   const ui = new ConsoleUI();
-  const projectSettings: IProjectSettings = {
-    name: await ui.ask('Project name:'),
-  };
-  makeDirectory(projectSettings.name);
-  process.stdout.write(`Project settings: ${JSON.stringify(projectSettings, null, 2)}\n`);
+  const name = await ui.ask('Project name:');
+  const description = await ui.ask('Description:');
+  const project = new Project({ directory: process.argv[2], name, description }, ui);
+  await project.generate();
 }
-
-main()
-  .then(() => {
-    process.stdout.write('Happy codding!\n');
-    process.exit(0);
-  })
-  .catch(() => {
-    process.stderr.write("Don't worry. Please try again.");
-    process.exit(1);
-  });
+if (validateArguments()) {
+  main()
+    .then(() => {
+      process.stdout.write('Happy codding!\n');
+      process.exit(0);
+    })
+    .catch((error) => {
+      process.stderr.write('We have an error!\n');
+      process.stderr.write(`${error.message}\n${error.stack}\n`);
+      process.stderr.write("Don't worry. Please try again.\n");
+      process.exit(1);
+    });
+} else {
+  process.stderr.write('TODO: usage help\n');
+}

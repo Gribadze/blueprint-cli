@@ -1,6 +1,7 @@
-import { default as readline, ReadLine } from 'readline';
+import readline, { ReadLine } from 'readline';
+import { IUI } from './types/IUI';
 
-class ConsoleUI {
+class ConsoleUI implements IUI {
   private rl: ReadLine;
   private readonly input: NodeJS.ReadableStream;
   private readonly output: NodeJS.WritableStream;
@@ -38,6 +39,14 @@ class ConsoleUI {
         resolve(answer);
       });
     });
+  }
+
+  public write(text: string): void {
+    this.output.write(text);
+  }
+
+  public writeln(text: string): void {
+    this.write(text + '\n');
   }
 }
 
