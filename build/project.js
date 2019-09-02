@@ -42,14 +42,24 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+/* tslint:disable:object-literal-sort-keys */
 var path = __importStar(require("path"));
 var helpers_1 = require("./helpers");
 var scripts = {
-    coverage: 'jest --coverage',
-    lint: "tslint --fix --project '.'",
-    prettier: 'prettier ./src/**/*.* --write',
-    start: 'ts-node src',
-    test: 'jest',
+    JS: {
+        test: 'jest',
+        coverage: 'jest --coverage',
+        start: 'node src',
+        lint: 'eslint ./src --fix',
+        prettier: 'prettier ./src/**/*.* --write',
+    },
+    TS: {
+        test: 'jest',
+        coverage: 'jest --coverage',
+        start: 'ts-node src',
+        lint: "tslint --fix --project '.'",
+        prettier: 'prettier ./src/**/*.* --write',
+    },
 };
 var husky = {
     hooks: {
@@ -57,41 +67,60 @@ var husky = {
     },
 };
 var lintStaged = {
-    'src/**/*.ts': ['npm run prettier', 'npm run lint', 'git add'],
+    JS: {
+        'src/**/*.js': ['npm run prettier', 'npm run lint', 'git add'],
+    },
+    TS: {
+        'src/**/*.ts': ['npm run prettier', 'npm run lint', 'git add'],
+    },
 };
-var devDependencies = [
-    '@types/jest',
-    '@types/node',
-    'husky',
-    'jest',
-    'lint-staged',
-    'prettier',
-    'ts-jest',
-    'ts-node',
-    'tslint',
-    'typescript',
-];
-var gitignore = "node_modules/\ncoverage/\n";
-var jestConfig = "module.exports = {\n  collectCoverageFrom: ['src/**/*.ts'],\n  notify: true,\n  preset: 'ts-jest',\n  testEnvironment: 'node',\n  verbose: true,\n};\n";
-var prettierConfig = "module.exports = {\n  parser: 'typescript',\n  singleQuote: true,\n  printWidth: 100,\n  trailingComma: 'all',\n  arrowParens: 'always',\n};\n";
+var devDependencies = {
+    JS: ['@types/jest', '@types/node', 'husky', 'jest', 'lint-staged', 'prettier', 'eslint'],
+    TS: [
+        '@types/jest',
+        '@types/node',
+        'husky',
+        'jest',
+        'lint-staged',
+        'prettier',
+        'ts-jest',
+        'ts-node',
+        'tslint',
+        'typescript',
+    ],
+};
+var gitignore = "node_modules/\ncoverage/\nbuild/\n";
+var jestConfig = {
+    JS: "module.exports = {\n  collectCoverageFrom: ['src/**/*.js'],\n  notify: true,\n  testEnvironment: 'node',\n  verbose: true,\n};\n",
+    TS: "module.exports = {\n  collectCoverageFrom: ['src/**/*.ts'],\n  notify: true,\n  preset: 'ts-jest',\n  testEnvironment: 'node',\n  verbose: true,\n};\n",
+};
+var prettierConfig = {
+    JS: "module.exports = {\n  singleQuote: true,\n  printWidth: 100,\n  trailingComma: 'all',\n  arrowParens: 'always',\n};\n",
+    TS: "module.exports = {\n  parser: 'typescript',\n  singleQuote: true,\n  printWidth: 100,\n  trailingComma: 'all',\n  arrowParens: 'always',\n};\n",
+};
 var tsConfig = {
     compilerOptions: {
         esModuleInterop: true,
         module: 'commonjs',
+        outDir: 'build',
         strict: true,
         target: 'es5',
     },
 };
-var tsLintConfig = {
-    defaultSeverity: 'error',
-    extends: [
-        'tslint:recommended',
-    ],
-    jsRules: {},
-    rules: {
-        quotemark: false,
+var lintConfig = {
+    JS: {
+        extends: ['eslint:recommended'],
     },
-    rulesDirectory: [],
+    TS: {
+        defaultSeverity: 'error',
+        extends: ['tslint:recommended'],
+        jsRules: {},
+        rules: {
+            'object-literal-key-quotes': [true, 'as-needed'],
+            quotemark: false,
+        },
+        rulesDirectory: [],
+    },
 };
 var Project = /** @class */ (function () {
     function Project(projectSettings, ui) {
@@ -100,26 +129,41 @@ var Project = /** @class */ (function () {
     }
     Project.prototype.generate = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var _a, directory, name, description, packageJsonData, srcDirectory;
+            var _a, directory, name, description, language, packageJsonData, srcDirectory;
             var _this = this;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
-                        _a = this.projectSettings, directory = _a.directory, name = _a.name, description = _a.description;
+                        _a = this.projectSettings, directory = _a.directory, name = _a.name, description = _a.description, language = _a.language;
                         this.ui.write('Creating project directory...');
                         helpers_1.makeDirectory(directory);
                         this.ui.writeln('OK');
                         this.ui.write('Configuring project development environment...');
-                        packageJsonData = { name: name, description: description, scripts: scripts, husky: husky, 'lint-staged': lintStaged };
+                        packageJsonData = {
+                            name: name,
+                            description: description,
+                            scripts: scripts[language],
+                            husky: husky,
+                            'lint-staged': lintStaged[language],
+                        };
                         helpers_1.createFile(path.join(directory, 'package.json'), JSON.stringify(packageJsonData, null, 2));
-                        helpers_1.createFile(path.join(directory, 'jest.config.js'), jestConfig);
-                        helpers_1.createFile(path.join(directory, 'prettier.config.js'), prettierConfig);
+                        helpers_1.createFile(path.join(directory, 'jest.config.js'), jestConfig[language]);
+                        helpers_1.createFile(path.join(directory, 'prettier.config.js'), prettierConfig[language]);
                         helpers_1.createFile(path.join(directory, '.gitignore'), gitignore);
-                        helpers_1.createFile(path.join(directory, 'tsconfig.json'), JSON.stringify(tsConfig, null, 2));
-                        helpers_1.createFile(path.join(directory, 'tslint.json'), JSON.stringify(tsLintConfig, null, 2));
+                        switch (language) {
+                            case 'JS':
+                                helpers_1.createFile(path.join(directory, '.eslintrc'), JSON.stringify(lintConfig[language], null, 2));
+                                break;
+                            case 'TS':
+                                helpers_1.createFile(path.join(directory, 'tsconfig.json'), JSON.stringify(tsConfig, null, 2));
+                                helpers_1.createFile(path.join(directory, 'tslint.json'), JSON.stringify(lintConfig[language], null, 2));
+                                break;
+                            default:
+                                break;
+                        }
                         srcDirectory = path.join(directory, 'src');
                         helpers_1.makeDirectory(srcDirectory);
-                        helpers_1.createFile(path.join(srcDirectory, 'index.ts'), '// TODO: Happy coding!\n');
+                        helpers_1.createFile(path.join(srcDirectory, "index." + (language === 'TS' ? 't' : 'j') + "s"), '// TODO: Happy coding!\n');
                         this.ui.writeln('OK');
                         this.ui.write('Initialize local git repository...');
                         return [4 /*yield*/, helpers_1.execExternal("cd " + directory + " && git init")];
@@ -127,7 +171,7 @@ var Project = /** @class */ (function () {
                         _b.sent();
                         this.ui.writeln('OK');
                         this.ui.write('Installing development dependencies...');
-                        return [4 /*yield*/, helpers_1.execExternal("cd " + directory + " && npm i -D " + devDependencies.join(' '))];
+                        return [4 /*yield*/, helpers_1.execExternal("cd " + directory + " && npm i -D " + devDependencies[language].join(' '))];
                     case 2:
                         _b.sent();
                         this.ui.writeln('OK');

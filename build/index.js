@@ -46,7 +46,7 @@ function validateArguments() {
 }
 function main() {
     return __awaiter(this, void 0, void 0, function () {
-        var ui, name, description, project;
+        var ui, name, description, language, project;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -57,9 +57,12 @@ function main() {
                     return [4 /*yield*/, ui.ask('Description:')];
                 case 2:
                     description = _a.sent();
-                    project = new project_1.default({ directory: process.argv[2], name: name, description: description }, ui);
-                    return [4 /*yield*/, project.generate()];
+                    return [4 /*yield*/, ui.select('Choose language:', ['JS', 'TS'])];
                 case 3:
+                    language = _a.sent();
+                    project = new project_1.default({ directory: process.argv[2], name: name, description: description, language: language }, ui);
+                    return [4 /*yield*/, project.generate()];
+                case 4:
                     _a.sent();
                     return [2 /*return*/];
             }

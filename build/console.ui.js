@@ -28,13 +28,16 @@ var ConsoleUI = /** @class */ (function () {
         return new Promise(function (resolve) {
             var renderString = [
                 question
-            ].concat(options.map(function (option, index) { return index + 1 + ") " + option; })).join('\n');
+            ].concat(options.map(function (option, index) { return index + 1 + ") " + option; }), [
+                '',
+            ]).join('\n');
             _this.rl.write(renderString);
             readline_1.default.cursorTo(_this.output, 0);
-            readline_1.default.moveCursor(_this.output, question.length + 1, -options.length);
-            _this.rl.on('line', function (answer) {
+            readline_1.default.moveCursor(_this.output, question.length + 1, -options.length - 1);
+            _this.rl.on('line', function (choice) {
                 readline_1.default.clearScreenDown(_this.output);
-                resolve(answer);
+                var answerIndex = parseInt(choice, 10);
+                resolve(options[answerIndex - 1]);
             });
         });
     };

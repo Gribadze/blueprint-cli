@@ -11,7 +11,7 @@ async function main() {
   const ui = new ConsoleUI();
   const name = await ui.ask('Project name:');
   const description = await ui.ask('Description:');
-  const language = await ui.select('Choose language:', ['JS', 'TS']) as TProgrammingLanguage;
+  const language = (await ui.select('Choose language:', ['JS', 'TS'])) as TProgrammingLanguage;
   const project = new Project({ directory: process.argv[2], name, description, language }, ui);
   await project.generate();
 }
