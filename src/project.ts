@@ -1,14 +1,24 @@
+/* tslint:disable:object-literal-sort-keys */
 import * as path from 'path';
 import { createFile, execExternal, makeDirectory } from './helpers';
 import { IUI } from './types/IUI';
 import { IProjectSettings } from './types/project.settings';
 
 const scripts = {
-  coverage: 'jest --coverage',
-  lint: "tslint --fix --project '.'",
-  prettier: 'prettier ./src/**/*.* --write',
-  start: 'ts-node src',
-  test: 'jest',
+  JS: {
+    test: 'jest',
+    coverage: 'jest --coverage',
+    start: 'node src',
+    lint: 'eslint ./src --fix',
+    prettier: 'prettier ./src/**/*.* --write',
+  },
+  TS: {
+    test: 'jest',
+    coverage: 'jest --coverage',
+    start: 'ts-node src',
+    lint: "tslint --fix --project '.'",
+    prettier: 'prettier ./src/**/*.* --write',
+  },
 };
 
 const husky = {
@@ -18,94 +28,146 @@ const husky = {
 };
 
 const lintStaged = {
-  'src/**/*.ts': ['npm run prettier', 'npm run lint', 'git add'],
+  JS: {
+    'src/**/*.js': ['npm run prettier', 'npm run lint', 'git add'],
+  },
+  TS: {
+    'src/**/*.ts': ['npm run prettier', 'npm run lint', 'git add'],
+  },
 };
 
-const devDependencies = [
-  '@types/jest',
-  '@types/node',
-  'husky',
-  'jest',
-  'lint-staged',
-  'prettier',
-  'ts-jest',
-  'ts-node',
-  'tslint',
-  'typescript',
-];
+const devDependencies = {
+  JS: ['@types/jest', '@types/node', 'husky', 'jest', 'lint-staged', 'prettier', 'eslint'],
+  TS: [
+    '@types/jest',
+    '@types/node',
+    'husky',
+    'jest',
+    'lint-staged',
+    'prettier',
+    'ts-jest',
+    'ts-node',
+    'tslint',
+    'typescript',
+  ],
+};
 
 const gitignore = `node_modules/
 coverage/
+build/
 `;
 
-const jestConfig = `module.exports = {
+const jestConfig = {
+  JS: `module.exports = {
+  collectCoverageFrom: ['src/**/*.js'],
+  notify: true,
+  testEnvironment: 'node',
+  verbose: true,
+};
+`,
+  TS: `module.exports = {
   collectCoverageFrom: ['src/**/*.ts'],
   notify: true,
   preset: 'ts-jest',
   testEnvironment: 'node',
   verbose: true,
 };
-`;
+`,
+};
 
-const prettierConfig = `module.exports = {
+const prettierConfig = {
+  JS: `module.exports = {
+  singleQuote: true,
+  printWidth: 100,
+  trailingComma: 'all',
+  arrowParens: 'always',
+};
+`,
+  TS: `module.exports = {
   parser: 'typescript',
   singleQuote: true,
   printWidth: 100,
   trailingComma: 'all',
   arrowParens: 'always',
 };
-`;
+`,
+};
 
 const tsConfig = {
   compilerOptions: {
     esModuleInterop: true,
     module: 'commonjs',
+    outDir: 'build',
     strict: true,
     target: 'es5',
   },
 };
 
-const tsLintConfig = {
-  defaultSeverity: 'error',
-  extends: ['tslint:recommended'],
-  jsRules: {},
-  rules: {
-    quotemark: false,
+const lintConfig = {
+  JS: {
+    extends: ['eslint:recommended'],
   },
-  rulesDirectory: [],
+  TS: {
+    defaultSeverity: 'error',
+    extends: ['tslint:recommended'],
+    jsRules: {},
+    rules: {
+      'object-literal-key-quotes': [true, 'as-needed'],
+      quotemark: false,
+    },
+    rulesDirectory: [],
+  },
 };
 
 class Project {
-  private readonly projectSettings: IProjectSettings;
-  private readonly ui: IUI;
-
-  constructor(projectSettings: IProjectSettings, ui: IUI) {
-    this.projectSettings = projectSettings;
-    this.ui = ui;
-  }
+  constructor(public readonly projectSettings: IProjectSettings, private readonly ui: IUI) {}
 
   public async generate(): Promise<void> {
-    const { directory, name, description } = this.projectSettings;
+    const { directory, name, description, language } = this.projectSettings;
     this.ui.write('Creating project directory...');
     makeDirectory(directory);
     this.ui.writeln('OK');
     this.ui.write('Configuring project development environment...');
-    const packageJsonData = { name, description, scripts, husky, 'lint-staged': lintStaged };
+    const packageJsonData = {
+      name,
+      description,
+      scripts: scripts[language],
+      husky,
+      'lint-staged': lintStaged[language],
+    };
     createFile(path.join(directory, 'package.json'), JSON.stringify(packageJsonData, null, 2));
-    createFile(path.join(directory, 'jest.config.js'), jestConfig);
-    createFile(path.join(directory, 'prettier.config.js'), prettierConfig);
+    createFile(path.join(directory, 'jest.config.js'), jestConfig[language]);
+    createFile(path.join(directory, 'prettier.config.js'), prettierConfig[language]);
     createFile(path.join(directory, '.gitignore'), gitignore);
-    createFile(path.join(directory, 'tsconfig.json'), JSON.stringify(tsConfig, null, 2));
-    createFile(path.join(directory, 'tslint.json'), JSON.stringify(tsLintConfig, null, 2));
+    switch (language) {
+      case 'JS':
+        createFile(
+          path.join(directory, '.eslintrc'),
+          JSON.stringify(lintConfig[language], null, 2),
+        );
+        break;
+      case 'TS':
+        createFile(path.join(directory, 'tsconfig.json'), JSON.stringify(tsConfig, null, 2));
+        createFile(
+          path.join(directory, 'tslint.json'),
+          JSON.stringify(lintConfig[language], null, 2),
+        );
+        break;
+      default:
+        break;
+    }
     const srcDirectory = path.join(directory, 'src');
     makeDirectory(srcDirectory);
-    createFile(path.join(srcDirectory, 'index.ts'), '// TODO: Happy coding!\n');
+    createFile(
+      path.join(srcDirectory, `index.${language === 'TS' ? 't' : 'j'}s`),
+      '// TODO: Happy coding!\n',
+    );
     this.ui.writeln('OK');
     this.ui.write('Initialize local git repository...');
     await execExternal(`cd ${directory} && git init`);
     this.ui.writeln('OK');
     this.ui.write('Installing development dependencies...');
-    await execExternal(`cd ${directory} && npm i -D ${devDependencies.join(' ')}`);
+    await execExternal(`cd ${directory} && npm i -D ${devDependencies[language].join(' ')}`);
     this.ui.writeln('OK');
     this.ui.write('Initial project commit...');
     await execExternal(

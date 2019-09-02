@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import ConsoleUI from './console.ui';
 import Project from './project';
+import { TProgrammingLanguage } from './types/project.settings';
 
 function validateArguments() {
   return process.argv.length > 2;
@@ -10,7 +11,8 @@ async function main() {
   const ui = new ConsoleUI();
   const name = await ui.ask('Project name:');
   const description = await ui.ask('Description:');
-  const project = new Project({ directory: process.argv[2], name, description }, ui);
+  const language = await ui.select('Choose language:', ['JS', 'TS']) as TProgrammingLanguage;
+  const project = new Project({ directory: process.argv[2], name, description, language }, ui);
   await project.generate();
 }
 if (validateArguments()) {

@@ -5,7 +5,8 @@
     ],
     "jsRules": {},
     "rules": {
-        "quotemark": false
+        "quotemark": false,
+        "object-literal-key-quotes": [true, "as-needed"]
     },
     "rulesDirectory": []
 }
