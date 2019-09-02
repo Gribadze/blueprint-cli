@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "build/index.js",
+  "repository": "https://github.com/Gribadze/blueprint-cli",
   "bin": {
     "blueprint": "build/index.js"
   },
@@ -42,6 +43,6 @@
       "git add"
     ]
   },
-  "author": "",
+  "author": "Dmitry Fiodorov <fedor.dmitry@gmail.com>",
   "license": "ISC"
 }
