@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import ConsoleUI from './console.ui';
 import Project from './project';
-import { TProgrammingLanguage } from './types/project.settings';
+import { TProgrammingLanguage } from './types/TProjectSettings';
 
 function validateArguments() {
   return process.argv.length > 2;

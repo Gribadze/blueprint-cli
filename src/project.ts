@@ -1,8 +1,8 @@
 /* tslint:disable:object-literal-sort-keys */
 import * as path from 'path';
 import { createFile, execExternal, makeDirectory } from './helpers';
-import { IUI } from './types/IUI';
-import { IProjectSettings } from './types/project.settings';
+import { IUI } from './interfaces/IUI';
+import { IProjectSettings } from './types/TProjectSettings';
 
 const scripts = {
   JS: {

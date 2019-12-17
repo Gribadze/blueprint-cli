@@ -1,5 +1,5 @@
 import readline, { ReadLine } from 'readline';
-import { IUI } from './types/IUI';
+import { IUI } from './interfaces/IUI';
 
 class ConsoleUI implements IUI {
   private rl: ReadLine;

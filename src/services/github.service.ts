@@ -1,7 +1,7 @@
-import * as childProcess from 'child_process';
 import * as http from 'http';
 import * as https from 'https';
 import * as url from 'url';
+import openLink from '../utils/openLink';
 
 export class GithubService {
   private readonly userAgent = 'Blueprint by Gribadze';
@@ -18,12 +18,12 @@ export class GithubService {
       const server = http.createServer();
 
       server.listen(3000, () => {
-        childProcess.spawn('xdg-open', [
+        openLink(
           'https://github.com/login/oauth/authorize' +
             `?client_id=${this.clientId}` +
             `&redirect_uri=http://localhost:3000/callback` +
             `&scope=${this.scopeList}`,
-        ]);
+        );
 
         server.on('request', (req, res) => {
           const { query } = url.parse(req.url, true);
