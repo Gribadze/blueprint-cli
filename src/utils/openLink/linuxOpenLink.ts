@@ -1,4 +1,4 @@
-import { TOpenLinkInitializer } from '../types/TOpenLinkInitializer';
+import { TOpenLinkInitializer } from './types';
 
 const linuxOpenLink: TOpenLinkInitializer = (processSpawn) => (url) => {
   processSpawn('xdg-open', [url]);

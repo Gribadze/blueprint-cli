@@ -1,9 +1,9 @@
 import * as childProcess from 'child_process';
-import { TOpenLink, TOpenLinkInitializer, TProcessSpawn } from '../types/TOpenLinkInitializer';
-import { TPlatformConfig } from '../types/TPlatformConfig';
+import { TPlatformConfig } from '../../types/TPlatformConfig';
 import getDarwinOpenLink from './darwinOpenLink';
 import fallbackOpenLink from './fallbackOpenLink';
 import linuxOpenLink from './linuxOpenLink';
+import { TOpenLink, TOpenLinkInitializer, TProcessSpawn } from './types';
 
 const platformConfig: TPlatformConfig<TOpenLinkInitializer> = {
   aix: fallbackOpenLink,

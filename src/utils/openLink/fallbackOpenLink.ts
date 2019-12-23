@@ -1,5 +1,5 @@
-import BlueprintError from '../errors/BlueprintError';
-import { TOpenLinkInitializer } from '../types/TOpenLinkInitializer';
+import BlueprintError from '../../errors/BlueprintError';
+import { TOpenLinkInitializer } from './types';
 
 class OpenLinkImplementationError extends BlueprintError {
   constructor() {

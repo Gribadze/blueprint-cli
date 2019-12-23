@@ -1,7 +1,7 @@
 import * as http from 'http';
-import * as https from 'https';
 import * as url from 'url';
 import openLink from '../utils/openLink';
+import request from '../utils/request';
 
 export class GithubService {
   private readonly userAgent = 'Blueprint by Gribadze';
@@ -44,56 +44,33 @@ export class GithubService {
   }
 
   public async getAccessToken(code: string): Promise<void> {
-    const data = await this.apiCall(
+    const data = await request.post(
       'https://github.com/login/oauth/access_token' +
         `?client_id=${this.clientId}` +
         `&client_secret=${this.clientSecret}` +
         `&code=${code}`,
-      'POST',
       {
-        accept: 'application/json',
+        headers: {
+          'User-Agent': this.userAgent,
+          accept: 'application/json',
+        },
       },
     );
-    this.accessToken = data.access_token;
-    this.tokenType = data.token_type;
-    this.grantedScope = data.scope;
+    const { access_token, token_type, scope } = JSON.parse(data);
+    this.accessToken = access_token;
+    this.tokenType = token_type;
+    this.grantedScope = scope;
   }
 
-  private async apiCall(path: string, method: string = 'GET', headers: any = {}): Promise<any> {
-    return new Promise((resolve, reject) => {
-      const request = https.get(
-        `${path}`,
-        {
-          headers: {
-            'User-Agent': this.userAgent,
-            ...headers,
-          },
-          method,
-        },
-        (res) => {
-          let responseData = '';
-          res.on('data', (data) => {
-            responseData += data.toString();
-          });
-
-          res.on('end', () => {
-            if (
-              res.headers['content-type'] &&
-              res.headers['content-type'].includes('application/json')
-            ) {
-              return resolve(JSON.parse(responseData.toString()));
-            }
-            resolve(responseData.toString());
-          });
-        },
-      );
-
-      request.on('error', (err) => {
-        reject(err);
-      });
-    });
+  public async createRemoteRepository(repositoryName: string): Promise<void> {
+    return;
   }
 }
 
 const service = new GithubService();
-service.authorize().then((code) => service.getAccessToken(code));
+service
+  .authorize()
+  .then((code) => service.getAccessToken(code))
+  .then(() => {
+    service.createRemoteRepository(`new-repo-${Date.now()}`);
+  });
