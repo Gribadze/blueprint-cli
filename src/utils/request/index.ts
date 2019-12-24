@@ -2,7 +2,7 @@ import * as http from 'http';
 import * as https from 'https';
 import { URL } from 'url';
 
-type TRequestOptions = http.RequestOptions;
+type TRequestOptions = http.RequestOptions | https.RequestOptions;
 type TIncomingMessage = http.IncomingMessage;
 type TRequestCallbackFunction = typeof http.request;
 type TRequestAsyncFunction = (url: string | URL, options: TRequestOptions) => Promise<any>;
@@ -34,24 +34,21 @@ const requestAsync: TRequestAsyncFunction = (
 ): Promise<any> => {
   return new Promise((resolve, reject) => {
     const protocol = url instanceof URL ? getProtocolUrl(url) : getProtocolString(url);
-    const clientRequest = requestSelector[protocol as keyof IRequestSelector](
-      url,
-      options,
-      (res: TIncomingMessage) => {
-        let responseData = '';
-        res.on('data', (data) => {
-          responseData += data;
-        });
+    const requestCallbackFunction = requestSelector[protocol as keyof IRequestSelector];
+    const clientRequest = requestCallbackFunction(url, options, (res: TIncomingMessage) => {
+      let responseData = '';
+      res.on('data', (data) => {
+        responseData += data;
+      });
 
-        res.on('end', () => {
-          resolve(responseData);
-        });
+      res.on('end', () => {
+        resolve(responseData);
+      });
 
-        res.on('error', (err) => {
-          reject(err);
-        });
-      },
-    );
+      res.on('error', (err) => {
+        reject(err);
+      });
+    });
 
     clientRequest.on('error', (err) => {
       reject(err);
@@ -60,8 +57,10 @@ const requestAsync: TRequestAsyncFunction = (
 };
 
 const requestProxyHandler = {
-  get: (target: any, name: string) => (url: string | URL, options: TRequestOptions) =>
-    requestAsync(url, { method: name, ...options }),
+  get: (target: any, name: string): TRequestAsyncFunction => (
+    url: string | URL,
+    options: TRequestOptions,
+  ) => requestAsync(url, { method: name.toUpperCase(), ...options }),
 };
 
 const request = new Proxy({}, requestProxyHandler);

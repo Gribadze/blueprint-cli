@@ -44,7 +44,7 @@ export class GithubService {
   }
 
   public async getAccessToken(code: string): Promise<void> {
-    const data = await request.post(
+    const response = await request.post(
       'https://github.com/login/oauth/access_token' +
         `?client_id=${this.clientId}` +
         `&client_secret=${this.clientSecret}` +
@@ -52,18 +52,28 @@ export class GithubService {
       {
         headers: {
           'User-Agent': this.userAgent,
-          accept: 'application/json',
         },
       },
     );
-    const { access_token, token_type, scope } = JSON.parse(data);
+    const { access_token, token_type, scope } = JSON.parse(response);
     this.accessToken = access_token;
     this.tokenType = token_type;
     this.grantedScope = scope;
   }
 
-  public async createRemoteRepository(repositoryName: string): Promise<void> {
-    return;
+  public async createRemoteRepository(name: string): Promise<void> {
+    const response = await request.post('https://api.github.com/user/repos', {
+      body: {
+        name,
+        private: false,
+        visibility: 'public',
+      },
+      headers: {
+        Authorization: `token ${this.accessToken}`,
+        accept: 'application/vnd.github.v3+json',
+      },
+    });
+    return response.toString();
   }
 }
 
@@ -71,6 +81,4 @@ const service = new GithubService();
 service
   .authorize()
   .then((code) => service.getAccessToken(code))
-  .then(() => {
-    service.createRemoteRepository(`new-repo-${Date.now()}`);
-  });
+  .then(() => service.createRemoteRepository(`new-repo-${Date.now()}`));
