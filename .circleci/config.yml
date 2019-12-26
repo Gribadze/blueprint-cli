@@ -47,6 +47,8 @@ jobs:
             - run:
                 name: Authenticate with registry
                 command: echo "//registry.npmjs.org/:_authToken=$npm_TOKEN" > ~/repo/.npmrc
+            - run: git config user.email "fedor.dmitry@gmail.com"
+            - run: git config user.name "Dmitry Fiodorov"
             - run: git add . && git commit -am "circleci git diff ???? [ci skip]"
             - run:
                 name: Increment version
