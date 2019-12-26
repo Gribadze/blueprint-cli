@@ -47,6 +47,7 @@ jobs:
             - run:
                 name: Authenticate with registry
                 command: echo "//registry.npmjs.org/:_authToken=$npm_TOKEN" > ~/repo/.npmrc
+            - run: git status
             - run:
                 name: Increment version
                 command: |
