@@ -54,7 +54,8 @@ jobs:
                 name: Increment version
                 command: |
                     npm version patch -m "Version patched to %s [ci skip]"
-                    git push --all
+                    git push origin master
+                    git push --tags
             - run:
                 name: Publish package
                 command: npm publish
